@@ -1,6 +1,9 @@
+'use client';
+
 // stores/auth-store.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { toast } from 'sonner';
 import { AuthState, User } from '@/types';
 
 const authApi = {
@@ -65,23 +68,24 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const { user, token } = await authApi.register(userData);
-          // Store token in localStorage for axios interceptor
           if (typeof window !== 'undefined') {
             localStorage.setItem('token', token);
           }
           set({ user, token, isAuthenticated: true, isLoading: false });
+          toast.success('Account created successfully');
         } catch (error) {
           set({ isLoading: false });
+          toast.error(error instanceof Error ? error.message : 'Registration failed');
           throw error;
         }
       },
 
       logout: () => {
-        // Remove token from localStorage
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token');
         }
         set({ user: null, token: null, isAuthenticated: false });
+        toast.info('Signed out');
       },
 
       initialize: () => {

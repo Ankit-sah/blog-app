@@ -1,6 +1,9 @@
+'use client';
+
 // stores/posts-store.ts
 import { create } from 'zustand';
 import { PostsState, Post, User } from '@/types';
+import { toast } from 'sonner';
 import { useAuthStore } from './authStore';
 
 // In-memory store for mock posts (simulates backend)
@@ -188,6 +191,7 @@ export const usePostsStore = create<PostsState>((set, get) => ({
         });
       } catch (error) {
         set({ error: 'Failed to fetch posts', isLoading: false });
+        toast.error('Unable to load posts');
       }
     },
 
@@ -207,6 +211,7 @@ export const usePostsStore = create<PostsState>((set, get) => ({
         }
       } catch (error) {
         set({ error: 'Failed to fetch post', isLoading: false });
+        toast.error('Unable to load that post');
       }
     },
 
@@ -236,8 +241,10 @@ export const usePostsStore = create<PostsState>((set, get) => ({
           currentPost: state.currentPost?.id === id ? updatedPost : state.currentPost,
           isLoading: false
         }));
+        toast.success('Post updated');
       } catch (error) {
         set({ error: 'Failed to update post', isLoading: false });
+        toast.error(error instanceof Error ? error.message : 'Failed to update post');
         throw error;
       }
     },
@@ -251,8 +258,10 @@ export const usePostsStore = create<PostsState>((set, get) => ({
           totalPosts: Math.max(0, state.totalPosts - 1),
           isLoading: false
         }));
+        toast.success('Post removed');
       } catch (error) {
         set({ error: 'Failed to delete post', isLoading: false });
+        toast.error(error instanceof Error ? error.message : 'Failed to delete post');
         throw error;
       }
     },
@@ -270,6 +279,7 @@ export const usePostsStore = create<PostsState>((set, get) => ({
         }));
       } catch (error) {
         console.error('Failed to like post:', error);
+        toast.error('Unable to register your applause right now');
       }
     },
 
